@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ 
+ <mapper namespace="com.javaEdu.springMVCBoard.dao.IRepository">
+ 	<resultMap id="list" type="com.javaEdu.springMVCBoard.dto.BDto">
+       <result property="bId" column="BID"/>
+       <result property="bName" column="BNAME"/>
+       <result property="bTitle" column="BTITLE"/>
+       <result property="bContent" column="BCONTENT"/>
+       <result property="bDate" column="BDATE"/>
+       <result property="bHit" column="BHIT"/>
+       <result property="bGroup" column="BGROUP"/>
+       <result property="bStep" column="BSTEP"/>
+       <result property="bIndent" column="BINDENT"/>
+	</resultMap>
+	
+	<insert id="write" parameterType="com.javaEdu.springMVCBoard.dto.BDto">
+		INSERT INTO MVC_BOARD (
+			BID, BNAME, BTITLE, BCONTENT, BHIT, BGROUP, BSTEP, BINDENT)
+		VALUES (
+			MVC_BOARD_SEQ.NEXTVAL, #{bName}, #{bTitle}, #{bContent}, 0, MVC_BOARD_SEQ.CURRVAL, 0, 0)
+	</insert>
+	
+	<select id="list" resultMap="list">
+		SELECT BID, BNAME, BTITLE, BCONTENT, BDATE, BHIT, BGROUP, BSTEP, BINDENT
+		FROM MVC_BOARD
+		ORDER BY BGROUP DESC, BSTEP ASC
+	</select>
+	
+	<select id="contentView" resultType="com.javaEdu.springMVCBoard.dto.BDto">
+		SELECT *
+		FROM MVC_BOARD
+		WHERE BID = #{bId}
+	</select>
+	
+	<update id="modify">
+		UPDATE MVC_BOARD
+		SET BNAME = #{bName}, BTITLE = #{bTitle}, BCONTENT = #{bContent}
+		WHERE BID = #{bId}
+	</update>
+	
+	<delete id="delete">
+		DELETE FROM MVC_BOARD
+		WHERE BID = #{bId}
+	</delete>
+	
+	<select id="reply_view" resultType="com.javaEdu.springMVCBoard.dto.BDto">
+		SELECT *
+		FROM MVC_BOARD
+		WHERE BID = #{bId}
+	</select>
+	
+   <insert id="reply">
+      INSERT INTO mvc_board (bId, bName, bTitle, bContent,
+      bGroup, bStep, bIndent)
+      VALUES (mvc_board_seq.nextval, #{bName}, #{bTitle}, #{bContent}, #{bGroup}, #{bStep}+1, #{bIndent}+1)
+   </insert>
+   
+   <update id="replyShape">
+      UPDATE mvc_board SET bStep = bStep + 1 WHERE bGroup = #{bGroup} AND bStep > #{bStep}
+   </update>
+	
+	<update id="upHit">
+		UPDATE MVC_BOARD
+		SET BHIT = BHIT +1
+		WHERE BID = #{bId}
+	</update>
+	
+</mapper>
